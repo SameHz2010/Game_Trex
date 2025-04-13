@@ -1,0 +1,96 @@
+# CubeIDE workspace metadata
+.metadata/
+*.launch
+*.mxproject
+*.ioc~           # backup file của .ioc
+
+# Build output folders
+Debug/
+Release/
+build/
+out/
+
+# Auto-generated STM32 Drivers (nếu dùng CubeMX để gen)
+Drivers/CMSIS/Device/
+Drivers/CMSIS/Include/
+Drivers/STM32*/       # Match STM32F0xx, STM32F1xx, STM32L4xx, etc.
+
+# Core generated code
+Core/Startup/
+Core/Src/system_*.c
+Core/Inc/system_*.h
+
+# Object files, binaries, and maps
+*.o
+*.obj
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+*.log
+*.d
+
+# IDE configuration files
+.cproject
+.project
+.settings/
+
+# VS Code (nếu mở song song)
+.vscode/
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# CLion / JetBrains
+.idea/
+*.iml
+
+# Keil uVision (nếu từng import)
+*.uvoptx
+*.uvprojx
+
+# IAR Embedded Workbench (nếu từng import)
+*.eww
+*.ewd
+*.ewp
+*.ewt
+*.dep
+
+# Library archives
+*.a
+*.lib
+*.la
+*.lo
+
+# Shared libs
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+
+# Debug info
+*.pdb
+*.su
+*.idb
+*.dSYM/
+
+# Precompiled headers
+*.gch
+*.pch
+
+# Editor & OS garbage
+*~
+*.swp
+*.tmp
+*.bak
+.DS_Store
+ehthumbs.db
+Thumbs.db
