@@ -1,3 +1,25 @@
+/**
+ * original author:  Tilen Majerle<tilen@majerle.eu>
+ * modification for SH1106: Controllerstech (www.controllerstech.com)
+
+   ----------------------------------------------------------------------
+   	Copyright (C) Alexander Lutsai, 2016
+    Copyright (C) Tilen Majerle, 2015
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   ----------------------------------------------------------------------
+ */
 #ifndef SH1106_H
 #define SH1106_H
 
@@ -64,7 +86,7 @@ typedef enum {
  */
 uint8_t SH1106_Init(void);
 
-/** 
+/**
  * @brief  Updates buffer from internal RAM to LCD
  * @note   This function must be called each time you do some changes to LCD, to update buffer from RAM to LCD
  * @param  None
@@ -80,7 +102,7 @@ void SH1106_UpdateScreen(void);
  */
 void SH1106_ToggleInvert(void);
 
-/** 
+/**
  * @brief  Fills entire LCD with desired color
  * @note   @ref SH1106_UpdateScreen() must be called after that in order to see updated LCD screen
  * @param  Color: Color to be used for screen fill. This parameter can be a value of @ref SH1106_COLOR_t enumeration
