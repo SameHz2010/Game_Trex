@@ -422,10 +422,10 @@ void Draw_Menu() {
 			SH1106_Puts("T-REX GAME", &Font_11x18, SH1106_COLOR_WHITE);
 
 			// Display menu options
-			SH1106_GotoXY(20, 20);
+			SH1106_GotoXY(30, 20);
 			SH1106_Puts("Play", &Font_7x10, SH1106_COLOR_WHITE);
 
-			SH1106_GotoXY(20, 30);
+			SH1106_GotoXY(30, 30);
 			SH1106_Puts("Setting", &Font_7x10, SH1106_COLOR_WHITE);
 
 			// Display dinosaur logo
@@ -462,6 +462,13 @@ void Draw_Menu() {
 				}
 			}
 		} else {
+			// Display title
+			SH1106_GotoXY(14, 1);
+			SH1106_Puts("T-REX GAME", &Font_11x18, SH1106_COLOR_WHITE);
+
+			// Display dinosaur logo
+			SH1106_DrawBitmap(46, 40, logo_trex, 36, 36, SH1106_COLOR_WHITE);
+
 			// Settings menu
 			static int settingSelection = 0; // 0 for Speed, 1 for Exit
 
@@ -544,28 +551,146 @@ void Draw_Menu() {
 // Draw game over screen
 void Draw_Game_Over() {
 	SH1106_Fill(SH1106_COLOR_BLACK);  // Clear screen
+	int currentSelection = 0; // 0 for Restart, 1 for Setting
+	bool inMainOverMenu = true; // Flag to track which menu we're in
 
-	// Display "GAME OVER" text
-	SH1106_GotoXY(15, 1);
-	SH1106_Puts("GAME OVER", &Font_11x18, SH1106_COLOR_WHITE);
+	while (game.GameOver) {
+		if (inMainOverMenu) {
+			// Display Game Over main screen
+			SH1106_Fill(SH1106_COLOR_BLACK);  // Clear screen
 
-	// Display high score
-	char scoreStr[12];
-	if(game.Score >= game.Hscore) {
-		game.Hscore = game.Score;  // Update high score if needed
+			// Display "GAME OVER" text
+			SH1106_GotoXY(15, 1);
+			SH1106_Puts("GAME OVER", &Font_11x18, SH1106_COLOR_WHITE);
+
+			// Display high score
+			char scoreStr[12];
+			if (game.Score >= game.Hscore) {
+				game.Hscore = game.Score;  // Update high score if needed
+			}
+			sprintf(scoreStr, "HI: %d", game.Hscore);
+			SH1106_GotoXY(30, 20);
+			SH1106_Puts(scoreStr, &Font_7x10, SH1106_COLOR_WHITE);
+
+			// Display current score
+			sprintf(scoreStr, "SCORE: %d", game.Score);
+			SH1106_GotoXY(30, 31);
+			SH1106_Puts(scoreStr, &Font_7x10, SH1106_COLOR_WHITE);
+
+			// Display restart option
+			SH1106_GotoXY(30, 40);
+			SH1106_Puts("Restart", &Font_7x10, SH1106_COLOR_WHITE);
+
+			// Display setting option
+			SH1106_GotoXY(30, 50);
+			SH1106_Puts("Setting", &Font_7x10, SH1106_COLOR_WHITE);
+
+			// Display arrow to indicate selection
+			if (currentSelection == 0) {
+				SH1106_DrawBitmap(1, 40, Arrow, 16, 9, SH1106_COLOR_WHITE);
+				SH1106_DrawBitmap(1, 50, Arrow, 16, 9, SH1106_COLOR_BLACK); // Clear other arrow
+			} else {
+				SH1106_DrawBitmap(1, 50, Arrow, 16, 9, SH1106_COLOR_WHITE);
+				SH1106_DrawBitmap(1, 40, Arrow, 16, 9, SH1106_COLOR_BLACK); // Clear other arrow
+			}
+
+			// Handle button 1 (down/select)
+			if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) == GPIO_PIN_SET) {
+				HAL_Delay(100); // Debounce
+				while (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) == GPIO_PIN_SET) {} // Wait for release
+				currentSelection = 1 - currentSelection; // Toggle selection
+			}
+
+			// Handle button 0 (confirm/start)
+			if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0) == GPIO_PIN_SET) {
+				HAL_Delay(100); // Debounce
+				while (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0) == GPIO_PIN_SET) {} // Wait for release
+
+				if (currentSelection == 0) { // Restart selected
+					Reset_Game(); // Restart game
+					return; // Exit game over screen
+				} else { // Setting selected
+					inMainOverMenu = false; // Switch to settings menu
+					SH1106_Fill(SH1106_COLOR_BLACK);  // Clear screen for settings menu
+				}
+			}
+		} else {
+			// Settings menu
+			static int settingSelection = 0; // 0 for Speed, 1 for Exit
+
+			// Display settings options
+			SH1106_GotoXY(20, 20);
+			SH1106_Puts("Speed: ", &Font_7x10, SH1106_COLOR_WHITE);
+
+			// Show current speed
+			char speed[10];
+			if (game.S_Obstacle == 4) sprintf(speed, "Easy");
+			else if (game.S_Obstacle == 7) sprintf(speed, "Normal");
+			else sprintf(speed, "Hard");
+
+			SH1106_GotoXY(70, 20);
+			SH1106_Puts(speed, &Font_7x10, SH1106_COLOR_WHITE);
+
+			SH1106_GotoXY(20, 30);
+			SH1106_Puts("Exit", &Font_7x10, SH1106_COLOR_WHITE);
+
+			// Display arrow selection for settings
+			if (settingSelection == 0) {
+				SH1106_DrawBitmap(1, 20, Arrow, 16, 9, SH1106_COLOR_WHITE);
+				SH1106_DrawBitmap(1, 30, Arrow, 16, 9, SH1106_COLOR_BLACK); // Clear other arrow
+			} else {
+				SH1106_DrawBitmap(1, 30, Arrow, 16, 9, SH1106_COLOR_WHITE);
+				SH1106_DrawBitmap(1, 20, Arrow, 16, 9, SH1106_COLOR_BLACK); // Clear other arrow
+			}
+
+			// Handle button 1 (down/select) in settings
+			if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) == GPIO_PIN_SET) {
+				HAL_Delay(100); // Debounce
+				while (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) == GPIO_PIN_SET) {} // Wait for release
+				settingSelection = 1 - settingSelection; // Toggle setting option
+			}
+
+			// Handle button 0 (confirm/action) in settings
+			if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0) == GPIO_PIN_SET) {
+				HAL_Delay(100); // Debounce
+				while (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0) == GPIO_PIN_SET) {} // Wait for release
+
+				if (settingSelection == 0) {
+					// Store the previous speed setting to compare
+					uint8_t prevSpeed = game.S_Obstacle;
+
+					// Update speed (cycle through options)
+					if (game.S_Obstacle == 4) game.S_Obstacle = 7;
+					else if (game.S_Obstacle == 7) game.S_Obstacle = 10;
+					else game.S_Obstacle = 4;
+
+					// Only redraw if the speed has changed
+					if (prevSpeed != game.S_Obstacle) {
+						// Clear the entire speed text area (x1=70, y1=20, x2=110, y2=28)
+						SH1106_ClearArea(70, 20, 110, 28, SH1106_COLOR_BLACK);
+
+						// Get the new speed text
+						char newSpeed[10];
+						if (game.S_Obstacle == 4) sprintf(newSpeed, "Easy");
+						else if (game.S_Obstacle == 7) sprintf(newSpeed, "Normal");
+						else sprintf(newSpeed, "Hard");
+
+						// Display the new speed
+						SH1106_GotoXY(70, 20);
+						SH1106_Puts(newSpeed, &Font_7x10, SH1106_COLOR_WHITE);
+					}
+
+					game.initialObstacleSpeed = game.S_Obstacle;
+				} else {
+					// Exit selected - return to game over main menu
+					inMainOverMenu = true;
+					SH1106_Fill(SH1106_COLOR_BLACK);  // Clear screen
+				}
+			}
+		}
+
+		SH1106_UpdateScreen(); // Update screen after each change
 	}
-	sprintf(scoreStr, "HI: %d", game.Hscore);
-	SH1106_GotoXY(35, 20);
-	SH1106_Puts(scoreStr, &Font_7x10, SH1106_COLOR_WHITE);
-
-	// Display current score
-	sprintf(scoreStr, "SCORE: %d", game.Score);
-	SH1106_GotoXY(35, 31);
-	SH1106_Puts(scoreStr, &Font_7x10, SH1106_COLOR_WHITE);
-
-	// Display restart icon
-	SH1106_DrawBitmap(57, 45, restart, 19, 14, SH1106_COLOR_WHITE);
-	SH1106_UpdateScreen();  // Update the display
 }
 
 // Main game function
